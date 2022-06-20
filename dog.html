@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
+    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Object Detector Web App</title>
+  </head>
+  <body class="bg-gray-500">
+    <h3
+      class="rounded-lg p-8 text-gray-200 bg-gray-700 drop-shadow-xl shadow-xl text-center text-3xl font-bold"
+    >
+      Object detector
+    </h3>
+
+    <div
+      class="space-y-4 w-[32rem] mx-auto w-[32rem] text-white font-bold text-xl text-center p-10 bg-gray-600 m-5 rounded-xl flex flex-col drop-shadow-xl shadow-xl"
+    >  <a href="index.html">Back</a>
+    </div>
+    <div class=" w-[32rem] mx-auto w-[32rem] text-white font-bold text-xl text-center p-10 bg-blue-600 m-5 rounded-xl drop-shadow-xl shadow-xl" id="status">Status: Detecting Objects</div>
+    <script>
+      img = "";
+      status = "";
+      function preload() {
+        img = loadImage(
+          "https://ichef.bbci.co.uk/news/976/cpsprodpb/17638/production/_124800859_gettyimages-817514614.jpg"
+        );
+      }
+      function setup() {
+        canvas = createCanvas(640, 420);
+        canvas.center();
+        objDetector = ml5.objectDetector("cocossd", modelLoaded);
+        document.getElementById("status").innerHTML =
+          "Status: Detecting Objects";
+      }
+      function modelLoaded() {
+        console.log(
+          "Why do you keep checking the console man, The results are on the screen now close the console"
+        );
+        status = true;
+        objDetector.detect(img, gotResult);
+      }
+      function gotResult(e, r) {
+        if (e) {
+          console.error(e);
+        }
+        console.log(r);
+        
+        objects = r;
+      }
+      function draw() {
+        image(img, 0, 0, 640, 420);
+        if (status != "") {
+          for (i = 0; i < objects.length; i++) {
+            document.getElementById("status").innerHTML =
+              "Status : Detected Objects";
+            fill("#FF0000");
+            percent = floor(objects[i].confidence * 100);
+            text(
+              objects[i].label + " " + percent + "%",
+              objects[i].x,
+              objects[i].y
+            );
+            noFill();
+            stroke("#FF0000");
+            rect(
+              objects[i].x,
+              objects[i].y,
+              objects[i].width,
+              objects[i].height
+            );
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
